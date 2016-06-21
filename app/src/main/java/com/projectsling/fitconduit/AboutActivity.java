@@ -1,5 +1,6 @@
 package com.projectsling.fitconduit;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,10 @@ public class AboutActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.aboutToolBar);
         toolbar.setTitle(R.string.about_toolbar_name);
         setSupportActionBar(toolbar);
+
+        //Needed for the back button
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
