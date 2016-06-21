@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Fit Conduit</string>
+    <string name="action_about">About</string>
+    <string name="about_toolbar_name">About</string>
 </resources>

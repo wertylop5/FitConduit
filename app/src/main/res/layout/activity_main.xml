@@ -4,11 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    xmlns:fitConduit="http://schemas.android.com/apk/res-auto"
     tools:context="com.projectsling.fitconduit.MainActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/mainToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        fitConduit:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -16,6 +23,15 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Calculator for conduit sizing"
         android:id="@+id/textView"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/mainToolbar"
         android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Based on NFPA 70-2005 (National Electrical Code), Chapter 9, Tables 4 and 5. All units in inches."
+        android:id="@+id/textView2"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"/>
 </RelativeLayout>
