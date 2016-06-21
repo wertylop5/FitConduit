@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:fitConduit="http://schemas.android.com/apk/res-auto"
-    tools:context="com.projectsling.fitconduit.MainActivity">
+    tools:context=".ui.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/mainToolbar"
@@ -17,12 +17,5 @@
         fitConduit:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Calculator for conduit sizing"
-        android:id="@+id/textView"
-        android:layout_below="@+id/mainToolbar"
-        android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>

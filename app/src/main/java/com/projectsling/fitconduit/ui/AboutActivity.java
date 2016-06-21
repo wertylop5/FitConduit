@@ -1,10 +1,12 @@
-package com.projectsling.fitconduit;
+package com.projectsling.fitconduit.ui;
 
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+
+import com.projectsling.fitconduit.R;
 
 public class AboutActivity extends AppCompatActivity {
     @Override
