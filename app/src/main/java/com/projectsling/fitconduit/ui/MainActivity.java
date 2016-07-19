@@ -1,22 +1,76 @@
 package com.projectsling.fitconduit.ui;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 
 import com.projectsling.fitconduit.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+//TODO Start creating a custom adapter for displaying the wires
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
+    FragmentManager mFragmentManager;
+    RelativeLayout mRelativeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
-        setSupportActionBar(mainToolbar);
+        mRelativeLayout = (RelativeLayout) findViewById(R.id.mainActivityContainer);
+
+        if(savedInstanceState == null) {
+            //Log.v(TAG, "null");
+            Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
+            setSupportActionBar(mainToolbar);
+
+            //Add the wire choice fragment
+            mFragmentManager = getSupportFragmentManager();
+            mFragmentManager.beginTransaction()
+                    .add(R.id.mainActivityContainer, new WireChoiceFragment())
+                    .add(R.id.mainActivityContainer, new ResultsFragment())
+                    .commit();
+            //
+        }
+
+
+
+        /*JSONObject test = new JSONObject();
+        try {
+            test.put("first", 5);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        doThing(test);*/
+
+        /*Spinner spinner = (Spinner) findViewById(R.id.mainSpinner);
+        String[] lol = new String[] {
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+                "one", "five", "three", "four", "two",
+        };
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, lol);
+        spinner.setAdapter(adapter);*/
+
+
     }
 
     @Override
@@ -34,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void doThing(JSONObject test) throws JSONException{
+        Log.v(TAG, test.toString(4));
     }
 
     public void openAbout() {
