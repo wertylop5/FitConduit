@@ -18,7 +18,6 @@ import com.projectsling.fitconduit.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//TODO Start creating a custom adapter for displaying the wires
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     FragmentManager mFragmentManager;
@@ -41,36 +40,7 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.mainActivityContainer, new WireChoiceFragment())
                     .add(R.id.mainActivityContainer, new ResultsFragment())
                     .commit();
-            //
         }
-
-
-
-        /*JSONObject test = new JSONObject();
-        try {
-            test.put("first", 5);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        doThing(test);*/
-
-        /*Spinner spinner = (Spinner) findViewById(R.id.mainSpinner);
-        String[] lol = new String[] {
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-                "one", "five", "three", "four", "two",
-        };
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, lol);
-        spinner.setAdapter(adapter);*/
-
-
     }
 
     @Override
