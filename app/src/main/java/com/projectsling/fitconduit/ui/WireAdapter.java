@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -35,27 +34,30 @@ public class WireAdapter extends BaseAdapter {
 
     Context mContext;
     List<JSONObject> mList;                 //Will need to make a list of names from this
-    List<RowState> mStates;                 //A state object for each row
-    //List<HashMap<Integer, Integer>> mStates;
-    HashMap<Integer, Integer> mStateMap;    //Holds state of each spinner <Row, Spinnerstate>
+    List<Integer> mItems;                   //A state object for each row
+    HashMap<Integer, Integer> mSpinnerMap;  //Holds state of each spinner <Row, Spinnerstate>
+    HashMap<Integer, String> mEditTextMap;  //Holds state of each spinner <Row, text>
 
     static class ViewHolder {
+        //int id;
         Spinner mSpinner;
         TextView mTextView;
         EditText mEditText;
-        //RowState mState;
     }
 
-    public WireAdapter(Context context, List<JSONObject> wireData, List<RowState> states) {
+    /*public WireAdapter(Context context, List<JSONObject> wireData, List<RowState> states) {
         mContext = context;
         mList = wireData;
         mStates = states;
-    }
+    }*/
 
-    public WireAdapter(Context context, List<JSONObject> wireData) {
+    public WireAdapter(Context context, List<JSONObject> wireData, List<Integer> entries) {
         mContext = context;
         mList = wireData;
-        mStates = null;
+        mItems = entries;
+
+        mSpinnerMap = new HashMap<>();
+        mEditTextMap = new HashMap<>();
     }
 
     List<String> getNames(List<JSONObject> json) {
@@ -75,12 +77,12 @@ public class WireAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mStates.size();
+        return mItems.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mStates.get(position);
+        return mItems.get(position);
     }
 
     @Override
@@ -96,8 +98,8 @@ public class WireAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         Log.v(LOG_TAG, "On row: " + position);
-        final ViewHolder holder;
-        final RowState currentState = ((RowState)getItem(position));
+        ViewHolder holder;
+        //final RowState currentState = ((RowState)getItem(position));
 
         if (convertView == null) {
             //Both same ways to get the inflater
@@ -106,10 +108,9 @@ public class WireAdapter extends BaseAdapter {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.row_wireadapter, parent, false);
 
-            mStateMap = new HashMap<>();
-
             //Using a view holder so no need to constantly find the view by id
             holder = new ViewHolder();
+            //holder.id = position;
             holder.mTextView = (TextView) convertView.findViewById(R.id.wireNumber);
             holder.mSpinner = (Spinner) convertView.findViewById(R.id.wireSpinner);
             holder.mEditText = (EditText) convertView.findViewById(R.id.wireAmount);
@@ -122,13 +123,8 @@ public class WireAdapter extends BaseAdapter {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int itemPosition, long id) {
                     //Store the current spinner position in the corresponding RowState
-                    currentState.setSpinnerPos(itemPosition);
+                    mSpinnerMap.put(position, itemPosition);
                     Log.v(LOG_TAG, "Row " + position + " saved spinner to " + itemPosition);
-                    //holder.mState.setSpinnerPos(itemPosition);
-                    /*Log.v(LOG_TAG, "Spinner pressed");
-                    Log.v(LOG_TAG, "Spinner state: " + Integer.toString(mStates.get(position).getSpinnerPos()));
-                    Log.v(LOG_TAG, "Position: " + Integer.toString(itemPosition));
-                    Log.v(LOG_TAG, "Item id: " + Long.toString(id));*/
                 }
 
                 @Override
@@ -140,26 +136,36 @@ public class WireAdapter extends BaseAdapter {
         }
         else {
             holder = (ViewHolder) convertView.getTag();
+
+            //This apparently needs to be repeated here
+            holder.mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int itemPosition, long id) {
+                    //Store the current spinner position in the corresponding RowState
+                    mSpinnerMap.put(position, itemPosition);
+                    Log.v(LOG_TAG, "Row " + position + " saved spinner to " + itemPosition);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
+            });
         }
 
         //Setting the view for each row, depending on if it is recycled
         holder.mTextView.setText(mContext.getResources().getString(R.string.wire, position));
+        Log.v(LOG_TAG, "Row " + position + " set text to " + mContext.getResources().getString(R.string.wire, position));
 
-        Log.v(LOG_TAG, currentState.toString());
-        //if ( currentState.getSpinnerPos() != -1 /* holder.mState.getSpinnerPos() != -1*/) {
-            //Log.v(LOG_TAG, "Triggered");
-            //Log.v(LOG_TAG, "Row: " + position + "\nspinnerPos: " + currentState.getSpinnerPos());
-            holder.mSpinner.setSelection(currentState.getSpinnerPos());
-            Log.v(LOG_TAG, "Row " + position + " set spinner to " + currentState.getSpinnerPos());
-            //holder.mSpinner.setSelection(mStates.get(position).getSpinnerPos());
-            holder.mEditText.setText(Integer.toString(currentState.getAmount()), TextView.BufferType.EDITABLE);
-            //holder.mEditText.setText("" + Integer.toString(holder.mState.getAmount()));
-        //}
-        //else {
-            /*Log.v(LOG_TAG, "default");
+        if (mSpinnerMap.containsKey(position)) {
+            holder.mSpinner.setSelection(mSpinnerMap.get(position));
+            Log.v(LOG_TAG, "Row " + position + " set spinner to " + mSpinnerMap.get(position));
+        }
+        else {
             holder.mSpinner.setSelection(0);
-            holder.mEditText.setText("0", TextView.BufferType.EDITABLE);*/
-        //}
+        }
+
+        /*holder.mSpinner.setSelection(currentState.getSpinnerPos());
+        Log.v(LOG_TAG, "Row " + position + " set spinner to " + currentState.getSpinnerPos());
+        holder.mEditText.setText(Integer.toString(currentState.getAmount()), TextView.BufferType.EDITABLE);*/
 
         return convertView;
     }
