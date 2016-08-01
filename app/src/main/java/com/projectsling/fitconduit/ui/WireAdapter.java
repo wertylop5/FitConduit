@@ -1,6 +1,8 @@
 package com.projectsling.fitconduit.ui;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +27,6 @@ import java.util.List;
 /**
  * Created by Stanley on 7/18/2016.
  */
-/**
- * TODO
- * Rewrite the adapter to have a list of numbers as the input
- *
- * */
 public class WireAdapter extends BaseAdapter {
     private static final String LOG_TAG = WireAdapter.class.getSimpleName();
 
@@ -118,22 +115,6 @@ public class WireAdapter extends BaseAdapter {
             holder.mSpinner.setAdapter(
                     new ArrayAdapter<String>(
                             mContext, android.R.layout.simple_spinner_dropdown_item, getNames(mList)));
-            holder.mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int itemPosition, long id) {
-                    //Store the current spinner position in the corresponding RowState
-                    currentState.setSpinnerPos(itemPosition);
-                    Log.v(LOG_TAG, "Row " + position + " saved spinner to " + itemPosition);
-                    //holder.mState.setSpinnerPos(itemPosition);
-                    /*Log.v(LOG_TAG, "Spinner pressed");
-                    Log.v(LOG_TAG, "Spinner state: " + Integer.toString(mStates.get(position).getSpinnerPos()));
-                    Log.v(LOG_TAG, "Position: " + Integer.toString(itemPosition));
-                    Log.v(LOG_TAG, "Item id: " + Long.toString(id));*/
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-            });
 
             //setTag allows a view to store data
             convertView.setTag(holder);
@@ -142,24 +123,59 @@ public class WireAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        holder.mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int itemPosition, long id) {
+                //Store the current spinner position in the corresponding RowState
+                currentState.setSpinnerPos(itemPosition);
+                //Log.v(LOG_TAG, "Row " + position + " saved spinner to " + itemPosition);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        //Bad
+        /*holder.mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //Safe because of short circuit
+                if (s == null || s.toString().equals("")) {
+                    Log.v(LOG_TAG, "Empty String");
+                    currentState.setAmount(0);
+                }
+                else {
+                    Log.v(LOG_TAG, "New text: " + s.toString());
+                    currentState.setAmount(Integer.parseInt(s.toString()));
+                }
+            }
+        });*/
+
+        holder.mEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    //Log.v(LOG_TAG, "Not focused");
+                    EditText editText = (EditText) v;
+                    currentState.setAmount(Integer.parseInt(editText.getText().toString()));
+                }
+            }
+        });
+
         //Setting the view for each row, depending on if it is recycled
         holder.mTextView.setText(mContext.getResources().getString(R.string.wire, position));
 
-        Log.v(LOG_TAG, currentState.toString());
-        //if ( currentState.getSpinnerPos() != -1 /* holder.mState.getSpinnerPos() != -1*/) {
-            //Log.v(LOG_TAG, "Triggered");
-            //Log.v(LOG_TAG, "Row: " + position + "\nspinnerPos: " + currentState.getSpinnerPos());
-            holder.mSpinner.setSelection(currentState.getSpinnerPos());
-            Log.v(LOG_TAG, "Row " + position + " set spinner to " + currentState.getSpinnerPos());
-            //holder.mSpinner.setSelection(mStates.get(position).getSpinnerPos());
-            holder.mEditText.setText(Integer.toString(currentState.getAmount()), TextView.BufferType.EDITABLE);
-            //holder.mEditText.setText("" + Integer.toString(holder.mState.getAmount()));
-        //}
-        //else {
-            /*Log.v(LOG_TAG, "default");
-            holder.mSpinner.setSelection(0);
-            holder.mEditText.setText("0", TextView.BufferType.EDITABLE);*/
-        //}
+        holder.mSpinner.setSelection(currentState.getSpinnerPos());
+        //Log.v(LOG_TAG, "Row " + position + " set spinner to " + currentState.getSpinnerPos());
+        //holder.mSpinner.setSelection(mStates.get(position).getSpinnerPos());
+        //Log.v(LOG_TAG, "Setting edittext to " + currentState.getAmount());
+        holder.mEditText.setText(Integer.toString(currentState.getAmount()), TextView.BufferType.EDITABLE);
 
         return convertView;
     }
