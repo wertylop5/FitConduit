@@ -13,12 +13,17 @@ For power conductors, make sure appropriate conductor gauge is specified for the
 
     <string-array
         name="wireNames">
-
+        <item>Hery</item>
+        <item>Boby</item>
     </string-array>
 
     <string-array
         name="conduitNames">
 
     </string-array>
+
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="wireAdd">Add a new wire</string>
 
 </resources>
