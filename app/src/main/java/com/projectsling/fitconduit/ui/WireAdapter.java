@@ -1,12 +1,15 @@
 package com.projectsling.fitconduit.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -27,6 +30,11 @@ import java.util.List;
 /**
  * Created by Stanley on 7/18/2016.
  */
+
+/**
+ * TODO
+ * Merge with master
+ * */
 public class WireAdapter extends BaseAdapter {
     private static final String LOG_TAG = WireAdapter.class.getSimpleName();
 
@@ -92,7 +100,7 @@ public class WireAdapter extends BaseAdapter {
     * */
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        Log.v(LOG_TAG, "On row: " + position);
+        //Log.v(LOG_TAG, "On row: " + position);
         final ViewHolder holder;
         final RowState currentState = ((RowState)getItem(position));
 
@@ -163,7 +171,7 @@ public class WireAdapter extends BaseAdapter {
                 if (!hasFocus) {
                     //Log.v(LOG_TAG, "Not focused");
                     EditText editText = (EditText) v;
-                    currentState.setAmount(Integer.parseInt(editText.getText().toString()));
+                    currentState.setAmount(editText.getText().toString());
                 }
             }
         });
@@ -175,7 +183,7 @@ public class WireAdapter extends BaseAdapter {
         //Log.v(LOG_TAG, "Row " + position + " set spinner to " + currentState.getSpinnerPos());
         //holder.mSpinner.setSelection(mStates.get(position).getSpinnerPos());
         //Log.v(LOG_TAG, "Setting edittext to " + currentState.getAmount());
-        holder.mEditText.setText(Integer.toString(currentState.getAmount()), TextView.BufferType.EDITABLE);
+        holder.mEditText.setText(currentState.getAmount(), TextView.BufferType.EDITABLE);
 
         return convertView;
     }

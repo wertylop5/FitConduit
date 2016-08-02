@@ -5,12 +5,12 @@ package com.projectsling.fitconduit.ui;
  * */
 public class RowState {
     private int mSpinnerPos;
-    private int mAmount;
+    private String mAmount;
     private boolean mIsRecycled;
 
     public RowState() {
         mSpinnerPos = 0;
-        mAmount = 0;
+        mAmount = "0";
         mIsRecycled = false;
     }
 
@@ -22,11 +22,11 @@ public class RowState {
         mIsRecycled = recycled;
     }
 
-    public int getAmount() {
+    public String getAmount() {
         return mAmount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(String amount) {
         mAmount = amount;
     }
 

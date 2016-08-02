@@ -6,9 +6,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -25,6 +27,7 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class WireChoiceFragment extends Fragment {
+    private static final String LOG_TAG = WireChoiceFragment.class.getSimpleName();
     private ListView mListView;
 
     public WireChoiceFragment() {
@@ -81,6 +84,15 @@ public class WireChoiceFragment extends Fragment {
 
         mListView = (ListView)root.findViewById(R.id.wireList);
         mListView.setAdapter(new WireAdapter(getActivity(), temp, another));
+
+        mListView.setItemsCanFocus(true);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.v(LOG_TAG, "Clicked " + position);
+            }
+        });
 
         //AN object used to apply attributes to views dynamically
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
