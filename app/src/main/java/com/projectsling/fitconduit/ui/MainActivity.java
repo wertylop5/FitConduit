@@ -2,26 +2,32 @@ package com.projectsling.fitconduit.ui;
 
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 
 import com.projectsling.fitconduit.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
+public class MainActivity extends AppCompatActivity implements WireCreatorDialog.OnWireCreateListener {
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     FragmentManager mFragmentManager;
     RelativeLayout mRelativeLayout;
+    private String mWireChoiceFragmentTag = "WireChoiceTag";
+    private String mResultsFragmentTag = "ResultsTag";
+
+    @Override
+    public void onWireCreate(String name, int amount) {
+        Log.v(LOG_TAG, "Got " + name + " and amount of " + amount);
+        WireChoiceFragment frag = (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
+        frag.createWire(name, amount);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +36,15 @@ public class MainActivity extends AppCompatActivity {
         mRelativeLayout = (RelativeLayout) findViewById(R.id.mainActivityContainer);
 
         if(savedInstanceState == null) {
-            //Log.v(TAG, "null");
+            //Log.v(LOG_TAG, "null");
             Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
             setSupportActionBar(mainToolbar);
 
             //Add the wire choice fragment
             mFragmentManager = getSupportFragmentManager();
             mFragmentManager.beginTransaction()
-                    .add(R.id.mainActivityContainer, new WireChoiceFragment())
-                    .add(R.id.mainActivityContainer, new ResultsFragment())
+                    .add(R.id.mainActivityContainer, new WireChoiceFragment(), mWireChoiceFragmentTag)
+                    .add(R.id.mainActivityContainer, new ResultsFragment(), mResultsFragmentTag)
                     .commit();
         }
     }
@@ -61,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doThing(JSONObject test) throws JSONException{
-        Log.v(TAG, test.toString(4));
+        Log.v(LOG_TAG, test.toString(4));
     }
 
     public void openAbout() {

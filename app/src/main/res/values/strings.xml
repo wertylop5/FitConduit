@@ -10,6 +10,7 @@
 
 For power conductors, make sure appropriate conductor gauge is specified for the rated current. The maximum ampacity of conductor can be found in NEC Annex B, Table B.310. From the table, choose the correct AWG and the insulation used for conductor (Article 310, table 310.13 for insulation details). DON'T forget to multiply by correction factor for ambient temperature!</string>
     <string name="wire">Wire %1$d</string>
+    <string name="wires">Wires</string>
 
     <string-array
         name="wireNames">

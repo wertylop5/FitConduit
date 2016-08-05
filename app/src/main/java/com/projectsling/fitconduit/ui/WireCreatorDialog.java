@@ -2,17 +2,17 @@ package com.projectsling.fitconduit.ui;
 
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -21,8 +21,22 @@ import android.widget.TextView;
 
 import com.projectsling.fitconduit.R;
 
+import org.json.JSONObject;
+
+import java.util.List;
+
 public class WireCreatorDialog extends DialogFragment {
     private static final String LOG_TAG = WireCreatorDialog.class.getSimpleName();
+    private List<JSONObject> mWireList;
+    private OnWireCreateListener mCallback;
+    //private String mSelectedItem;               //Holds the selected spinner item
+    //private int mAmount;                        //Holds the wire amount
+    private Spinner mSpinner;
+    private NumberPicker mPicker;
+
+    public interface OnWireCreateListener {
+        void onWireCreate(String name, int amount);
+    }
 
     private int dpToPixel(float dp) {
         float scale = getActivity().getResources().getDisplayMetrics().density;
@@ -42,29 +56,57 @@ public class WireCreatorDialog extends DialogFragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
 
-        NumberPicker picker = (NumberPicker) view.findViewById(R.id.dialogPicker);
-        picker.setMinValue(0);
-        picker.setMaxValue(99);
-        picker.setGravity(Gravity.CENTER_VERTICAL);
-        picker.setPadding(dpToPixel(2), 0, dpToPixel(20), 0);
-        picker.setLayoutParams(new LinearLayout.LayoutParams(
+        mPicker = (NumberPicker) view.findViewById(R.id.dialogPicker);
+        mPicker.setMinValue(0);
+        mPicker.setMaxValue(99);
+        mPicker.setGravity(Gravity.CENTER_VERTICAL);
+        mPicker.setPadding(dpToPixel(2), 0, dpToPixel(20), 0);
+        mPicker.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 1.0f
         ));
+        //Potentially unneeded
+        /*mPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                Log.v(LOG_TAG, newVal + "");
+            }
+        });*/
 
-        Spinner spinner = (Spinner) view.findViewById(R.id.dialogSpinner);
-        spinner.setAdapter(ArrayAdapter.createFromResource(
+        mSpinner = (Spinner) view.findViewById(R.id.dialogSpinner);
+        mSpinner.setAdapter(ArrayAdapter.createFromResource(
                 getActivity(), R.array.wireNames, android.R.layout.simple_spinner_dropdown_item));
-        spinner.setGravity(Gravity.CENTER_VERTICAL);
-        spinner.setLayoutParams(new LinearLayout.LayoutParams(
+        mSpinner.setGravity(Gravity.CENTER_VERTICAL);
+        mSpinner.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 1.0f
         ));
-        spinner.setPadding(dpToPixel(5), 0, dpToPixel(2), 0);
+        mSpinner.setPadding(dpToPixel(5), 0, dpToPixel(2), 0);
+        /*mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mSelectedItem = ((TextView)view).getText().toString();
+                Log.v(LOG_TAG, "In spinner: " + mSelectedItem);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });*/
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (OnWireCreateListener)context;
+        }
+        catch (ClassCastException e) {
+            Log.e(LOG_TAG, "Class cast ", e);
+        }
     }
 
     @Override
@@ -76,6 +118,9 @@ public class WireCreatorDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Log.v(LOG_TAG, "Created new wire");
+                        mCallback.onWireCreate(
+                                ((TextView)mSpinner.getSelectedView()).getText().toString(),
+                                mPicker.getValue());
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

@@ -1,15 +1,13 @@
 package com.projectsling.fitconduit.ui;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -20,24 +18,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class WireChoiceFragment extends Fragment {
+    private static final String LOG_TAG = WireChoiceFragment.class.getSimpleName();
     private ListView mListView;
     private Button mButton;
 
-    public WireChoiceFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
+    public WireChoiceFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,5 +68,9 @@ public class WireChoiceFragment extends Fragment {
         root.setLayoutParams(params);
         return root;
 
+    }
+
+    public void createWire(String name, int amount) {
+        Log.v(LOG_TAG, "Got " + name + " with " + amount);
     }
 }
