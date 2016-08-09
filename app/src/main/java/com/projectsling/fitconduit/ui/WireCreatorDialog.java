@@ -23,11 +23,12 @@ import com.projectsling.fitconduit.R;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WireCreatorDialog extends DialogFragment {
     private static final String LOG_TAG = WireCreatorDialog.class.getSimpleName();
-    private List<JSONObject> mWireList;
+    private List<CharSequence> mWireNames;
     private OnWireCreateListener mCallback;
     //private String mSelectedItem;               //Holds the selected spinner item
     //private int mAmount;                        //Holds the wire amount
@@ -36,6 +37,16 @@ public class WireCreatorDialog extends DialogFragment {
 
     public interface OnWireCreateListener {
         void onWireCreate(String name, int amount);
+    }
+
+    public static WireCreatorDialog newInstance(ArrayList<CharSequence> wireNames) {
+        WireCreatorDialog dialog = new WireCreatorDialog();
+        Bundle bundle = new Bundle();
+
+        bundle.putCharSequenceArrayList("wireNames", wireNames);
+        dialog.setArguments(bundle);
+
+        return dialog;
     }
 
     private int dpToPixel(float dp) {
@@ -75,8 +86,14 @@ public class WireCreatorDialog extends DialogFragment {
         });*/
 
         mSpinner = (Spinner) view.findViewById(R.id.dialogSpinner);
-        mSpinner.setAdapter(ArrayAdapter.createFromResource(
-                getActivity(), R.array.wireNames, android.R.layout.simple_spinner_dropdown_item));
+        /*mSpinner.setAdapter(ArrayAdapter.createFromResource(
+                getActivity(), R.array.wireNames, android.R.layout.simple_spinner_dropdown_item));*/
+        mSpinner.setAdapter(new ArrayAdapter<CharSequence>(
+                getActivity(),
+                android.R.layout.simple_spinner_dropdown_item,
+                mWireNames
+        ));
+
         mSpinner.setGravity(Gravity.CENTER_VERTICAL);
         mSpinner.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -112,6 +129,9 @@ public class WireCreatorDialog extends DialogFragment {
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Bundle bundle = getArguments();
+        mWireNames = bundle.getCharSequenceArrayList("wireNames");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.wireAdd)
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
