@@ -39,29 +39,45 @@ public class MainActivity extends AppCompatActivity implements WireCreatorDialog
         setContentView(R.layout.activity_main);
         mRelativeLayout = (RelativeLayout) findViewById(R.id.mainActivityContainer);
 
+        mFragmentManager = getSupportFragmentManager();
+
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
+        setSupportActionBar(mainToolbar);
+
         if(savedInstanceState == null) {
             //Log.v(LOG_TAG, "null");
-            Toolbar mainToolbar = (Toolbar) findViewById(R.id.mainToolbar);
-            setSupportActionBar(mainToolbar);
 
+
+            //Holds the json for each wire
+            //Should be in form of
+            /*
+            * {
+            *   "name":<string>,
+            *   "od":<double>
+            * }
+            * */
             ArrayList<JSONObject> list = new ArrayList<>();
             try {
-                list.add(new JSONObject("{\"name\":\"uno\", \"od\":1}"));
-                list.add(new JSONObject("{\"name\":\"dos\", \"od\":2}"));
-                list.add(new JSONObject("{\"name\":\"tres\", \"od\":3}"));
+                list.add(new JSONObject("{\"name\":\"uno\", \"od\":1.0}"));
+                list.add(new JSONObject("{\"name\":\"dos\", \"od\":2.0}"));
+                list.add(new JSONObject("{\"name\":\"tres\", \"od\":3.0}"));
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "JSON exception", e);
             }
 
             WireChoiceFragment frag = WireChoiceFragment.newInstance(list);
-
             //Add the wire choice fragment
-            mFragmentManager = getSupportFragmentManager();
             mFragmentManager.beginTransaction()
                     .add(R.id.mainActivityContainer, frag, mWireChoiceFragmentTag)
                     .add(R.id.mainActivityContainer, new ResultsFragment(), mResultsFragmentTag)
                     .commit();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 
     @Override

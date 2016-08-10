@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.projectsling.fitconduit.R;
+import com.projectsling.fitconduit.model.WireAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +30,7 @@ public class WireChoiceFragment extends Fragment {
     private static final String LOG_TAG = WireChoiceFragment.class.getSimpleName();
 
     private List<JSONObject> mWireList;
+    private WireAdapter mWireAdapter;
 
     private ListView mListView;
     private Button mButton;
@@ -51,27 +53,29 @@ public class WireChoiceFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
 
-        mWireList = (ArrayList<JSONObject>) bundle.getSerializable("wireList");
+        if (bundle.containsKey("wireList")) {
+            mWireList = (ArrayList<JSONObject>) bundle.getSerializable("wireList");
+            getArguments().remove("wireList");
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        //This frag will be saved across activity recreation
+        setRetainInstance(true);
+
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_wire_choice, container, false);
 
-        /*List<JSONObject> temp = new ArrayList<>();
-        try {
-            temp.add(new JSONObject("{\"name\":\"uno\"}"));
-            temp.add(new JSONObject("{\"name\":\"dos\"}"));
-            temp.add(new JSONObject("{\"name\":\"tres\"}"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
-
         mListView = (ListView) root.findViewById(R.id.wireList);
-        mButton = (Button) root.findViewById(R.id.addWireButton);
+        if (savedInstanceState == null) {
+            //Init adapter with empty list
+            mWireAdapter = new WireAdapter(getActivity(), new ArrayList<JSONObject>());
+        }
+        mListView.setAdapter(mWireAdapter);
 
+        mButton = (Button) root.findViewById(R.id.addWireButton);
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,10 +84,9 @@ public class WireChoiceFragment extends Fragment {
             }
         });
 
-
-        //AN object used to apply attributes to views dynamically
+        //An object used to apply attributes to views dynamically
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         );
 
         //Dynamically add attributes
@@ -91,13 +94,22 @@ public class WireChoiceFragment extends Fragment {
 
         //Apply to the root (i.e. the FrameLayout)
         root.setLayoutParams(params);
-        return root;
 
+        return root;
     }
 
     //MainActivity calls this
     public void createWire(String name, int amount) {
         Log.v(LOG_TAG, "Got " + name + " with " + amount);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("name", name)
+                    .put("amount", amount);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "JSONException", e);
+        }
+
+        mWireAdapter.addEntry(json);
     }
 
     private ArrayList<CharSequence> makeWireNameList() {
