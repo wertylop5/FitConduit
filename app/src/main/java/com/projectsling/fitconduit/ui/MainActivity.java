@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements WireCreatorDialog
         if(savedInstanceState == null) {
             //Log.v(LOG_TAG, "null");
 
-
             //Holds the json for each wire
             //Should be in form of
             /*
@@ -77,8 +76,15 @@ public class MainActivity extends AppCompatActivity implements WireCreatorDialog
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        //Log.v(LOG_TAG, "Destroyed");
     }
+
+    /*@Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (!outState.containsKey("keepFrag")) {
+            outState.putBoolean("keepFrag", true);
+        }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

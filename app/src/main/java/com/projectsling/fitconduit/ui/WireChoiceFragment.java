@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -25,6 +26,7 @@ import java.util.List;
  * TODO
  * Create a map from list of jsonobjects
  * create a model to store the name and amount of an entry to pass to adapter
+ * Too many wires cause create wire button to slide off
  * */
 public class WireChoiceFragment extends Fragment {
     private static final String LOG_TAG = WireChoiceFragment.class.getSimpleName();
@@ -34,6 +36,7 @@ public class WireChoiceFragment extends Fragment {
 
     private ListView mListView;
     private Button mButton;
+    private WireCreatorDialog mWireCreatorDialog;
 
     public WireChoiceFragment() {}
 
@@ -56,6 +59,10 @@ public class WireChoiceFragment extends Fragment {
         if (bundle.containsKey("wireList")) {
             mWireList = (ArrayList<JSONObject>) bundle.getSerializable("wireList");
             getArguments().remove("wireList");
+            mWireCreatorDialog = WireCreatorDialog.newInstance(makeWireNameList());
+        }
+        else {
+            Log.e(LOG_TAG, "No wire list found");
         }
     }
 
@@ -75,12 +82,50 @@ public class WireChoiceFragment extends Fragment {
         }
         mListView.setAdapter(mWireAdapter);
 
+        //Long click allows user to edit the wire
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.v(LOG_TAG, position + "");
+
+                try {
+                    /*WireCreatorDialog.newInstance(makeWireNameList())
+                            .setSpinnerPos(
+                                    ((JSONObject) mWireAdapter.getItem(position)).getString("name")
+                            )
+                            .setPicker(
+                                    ((JSONObject) mWireAdapter.getItem(position)).getInt("amount")
+                            )
+                            .show(getActivity().getSupportFragmentManager(), "wireCreator");*/
+                    /*mWireCreatorDialog
+                            .setSpinnerPos(
+                                    ((JSONObject) mWireAdapter.getItem(position)).getString("name")
+                            )
+                            .setPicker(
+                                    ((JSONObject) mWireAdapter.getItem(position)).getInt("amount")
+                            )
+                            .show(getActivity().getSupportFragmentManager(), "wireCreator");*/
+                    WireEditorDialog.newInstance(
+                            makeWireNameList(),
+                            ((JSONObject) mWireAdapter.getItem(position)).getString("name"),
+                            ((JSONObject) mWireAdapter.getItem(position)).getInt("amount"),
+                            position)
+                            .show(getActivity().getSupportFragmentManager(), "wireEditor");
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "JSONException", e);
+                }
+
+                return true;
+            }
+        });
+
         mButton = (Button) root.findViewById(R.id.addWireButton);
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WireCreatorDialog.newInstance(makeWireNameList())
-                        .show(getActivity().getSupportFragmentManager(), "wireCreator");
+                /*WireCreatorDialog.newInstance(makeWireNameList())
+                        .show(getActivity().getSupportFragmentManager(), "wireCreator");*/
+                mWireCreatorDialog.show(getActivity().getSupportFragmentManager(), "wireCreator");
             }
         });
 
