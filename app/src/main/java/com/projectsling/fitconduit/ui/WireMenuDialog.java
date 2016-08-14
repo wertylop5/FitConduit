@@ -16,11 +16,6 @@ import android.view.ViewGroup;
 
 import com.projectsling.fitconduit.R;
 
-
-/**
- * TODO figure out how to open the editor dialogue cuz it needs args
- * use mainactivity somehow?
- * */
 public class WireMenuDialog extends DialogFragment {
     public WireMenuDialog() {}
     private static final String LOG_TAG = WireMenuDialog.class.getSimpleName();
