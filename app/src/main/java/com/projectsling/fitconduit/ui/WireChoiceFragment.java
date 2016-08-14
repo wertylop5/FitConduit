@@ -88,23 +88,7 @@ public class WireChoiceFragment extends Fragment {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.v(LOG_TAG, position + "");
 
-                try {
-                    /*WireCreatorDialog.newInstance(makeWireNameList())
-                            .setSpinnerPos(
-                                    ((JSONObject) mWireAdapter.getItem(position)).getString("name")
-                            )
-                            .setPicker(
-                                    ((JSONObject) mWireAdapter.getItem(position)).getInt("amount")
-                            )
-                            .show(getActivity().getSupportFragmentManager(), "wireCreator");*/
-                    /*mWireCreatorDialog
-                            .setSpinnerPos(
-                                    ((JSONObject) mWireAdapter.getItem(position)).getString("name")
-                            )
-                            .setPicker(
-                                    ((JSONObject) mWireAdapter.getItem(position)).getInt("amount")
-                            )
-                            .show(getActivity().getSupportFragmentManager(), "wireCreator");*/
+                /*try {
                     WireEditorDialog.newInstance(
                             makeWireNameList(),
                             ((JSONObject) mWireAdapter.getItem(position)).getString("name"),
@@ -113,7 +97,10 @@ public class WireChoiceFragment extends Fragment {
                             .show(getActivity().getSupportFragmentManager(), "wireEditor");
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "JSONException", e);
-                }
+                }*/
+
+                WireMenuDialog.newInstance(position)
+                        .show(getActivity().getSupportFragmentManager(), "wireMenu");
 
                 return true;
             }
@@ -157,6 +144,25 @@ public class WireChoiceFragment extends Fragment {
         mWireAdapter.addEntry(json);
     }
 
+    //MainActivity calls this
+    public void editWire(String newWire, int amount, int wireListPosition) {
+        Log.v(LOG_TAG, "New name " + newWire + " new amount " + amount + " pos " + wireListPosition);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("name", newWire)
+                    .put("amount", amount);
+            mWireAdapter.editEntry(json, wireListPosition);
+        }
+        catch (JSONException e) {
+            Log.e(LOG_TAG, "JSONException", e);
+        }
+    }
+
+    //MainActivity calls this
+    public void deleteWire(int wireListPosition) {
+        mWireAdapter.deleteEntry(wireListPosition);
+    }
+
     private ArrayList<CharSequence> makeWireNameList() {
         ArrayList<CharSequence> result = new ArrayList<>();
 
@@ -173,5 +179,19 @@ public class WireChoiceFragment extends Fragment {
         }
 
         return result;
+    }
+
+    //Position is the wire position in the list
+    public void startEditDialog(int wireListPosition) {
+        try {
+            WireEditorDialog.newInstance(
+                        makeWireNameList(),
+                        ((JSONObject) mWireAdapter.getItem(wireListPosition)).getString("name"),
+                        ((JSONObject) mWireAdapter.getItem(wireListPosition)).getInt("amount"),
+                        wireListPosition)
+                    .show(getActivity().getSupportFragmentManager(), "wireEditor");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "JSONException", e);
+        }
     }
 }

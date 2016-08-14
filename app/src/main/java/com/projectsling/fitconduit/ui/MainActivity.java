@@ -17,7 +17,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements WireCreatorDialog.OnWireCreateListener {
+public class MainActivity extends AppCompatActivity
+        implements WireCreatorDialog.OnWireCreateListener, WireEditorDialog.OnWireEditListener,
+WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     FragmentManager mFragmentManager;
     RelativeLayout mRelativeLayout;
@@ -27,10 +29,36 @@ public class MainActivity extends AppCompatActivity implements WireCreatorDialog
     //WireCreatorDialog calls this
     @Override
     public void onWireCreate(String name, int amount) {
-        Log.v(LOG_TAG, "Got " + name + " and amount of " + amount);
+        Log.v(LOG_TAG, "Got new wire " + name + " and amount of " + amount);
         WireChoiceFragment frag =
                 (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
         frag.createWire(name, amount);
+    }
+
+    @Override
+    public void onWireEdit(String newWire, int amount, int position) {
+        Log.v(LOG_TAG, "Got edit wire name " + newWire +
+                " new amount " + amount + " at position " + position);
+        WireChoiceFragment frag =
+                (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
+        frag.editWire(newWire, amount, position);
+    }
+
+    @Override
+    public void onWireDelete(int wireListPosition) {
+        WireChoiceFragment frag =
+                (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
+        frag.deleteWire(wireListPosition);
+    }
+
+    //Shows the wire edit dialog
+    @Override
+    public void startEdit(int wireListPosition) {
+        Log.v(LOG_TAG, "Starting edit dialog");
+
+        WireChoiceFragment frag =
+                (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
+        frag.startEditDialog(wireListPosition);
     }
 
     @Override

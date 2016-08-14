@@ -36,4 +36,8 @@ For power conductors, make sure appropriate conductor gauge is specified for the
     <string name="edit">Edit</string>
     <string name="wireEdit">Edit wire %1$d</string>
 
+    <!--Used in WireDeleteDialog-->
+    <string name="delete">Delete</string>
+    <string name="deletePrompt">Delete wire %1$d?</string>
+
 </resources>

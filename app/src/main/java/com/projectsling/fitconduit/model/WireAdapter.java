@@ -101,4 +101,15 @@ public class WireAdapter extends BaseAdapter{
         mModels.add(json);
         notifyDataSetChanged();
     }
+
+    public void editEntry(JSONObject json, int wireListPosition) {
+        mModels.remove(wireListPosition);
+        mModels.add(wireListPosition, json);
+        notifyDataSetChanged();
+    }
+
+    public void deleteEntry(int wireListPosition) {
+        mModels.remove(wireListPosition);
+        notifyDataSetChanged();
+    }
 }

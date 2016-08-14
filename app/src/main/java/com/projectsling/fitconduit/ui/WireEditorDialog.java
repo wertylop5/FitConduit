@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,6 +22,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.projectsling.fitconduit.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +40,18 @@ public class WireEditorDialog extends DialogFragment {
     private String mWire;                       //Name of wire to edit
     private int mAmount;                        //Amount to init with
     private int mPosition;                      //Position of edit wire in listview
+    private OnWireEditListener mCallback;
+
     private Spinner mSpinner;
     private NumberPicker mPicker;
+
+    public interface OnWireEditListener {
+        /*
+         * newWire is the name of the wire
+         * position is its position in the adapter
+         * */
+        void onWireEdit(String newWire, int amount, int position);
+    }
 
     public static WireEditorDialog newInstance(
             ArrayList<CharSequence> wireNames, String initWire, int initAmount, int position) {
@@ -98,20 +112,22 @@ public class WireEditorDialog extends DialogFragment {
         return view;
     }
 
-    /*@Override
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         try {
-            mCallback = (OnWireCreateListener)context;
+            mCallback = (OnWireEditListener) context;
         }
         catch (ClassCastException e) {
             Log.e(LOG_TAG, "Class cast ", e);
         }
-    }*/
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Bundle bundle = getArguments();
         if (bundle.containsKey("wireNames")) {
             mWireNames = bundle.getCharSequenceArrayList("wireNames");
@@ -138,6 +154,10 @@ public class WireEditorDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Log.v(LOG_TAG, "Editing wire");
+                        mCallback.onWireEdit(
+                                ((TextView) mSpinner.getSelectedView()).getText().toString(),
+                                mPicker.getValue(),
+                                mPosition);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -146,6 +166,16 @@ public class WireEditorDialog extends DialogFragment {
                         Log.v(LOG_TAG, "Cancelled wire edit");
                     }
                 })
+                /*.setNegativeButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.v(LOG_TAG, "Deleting wire");
+                        *//*ArrayList<CharSequence> j = new ArrayList<CharSequence>();
+                        j.add("fe");
+                        (WireCreatorDialog.newInstance(
+                                j)).show(getActivity().getSupportFragmentManager(), "lol");*//*
+                    }
+                })*/
                 .setView(initDialogBody());
 
         return builder.create();
@@ -157,6 +187,9 @@ public class WireEditorDialog extends DialogFragment {
         return Math.round(dp * scale + 0.5f);
     }
 
+    /*
+    Creates a map where the keys are the wire names and the values are the spinner positions
+    */
     private Map<String, Integer> makeWireMap(List<CharSequence> wireList) {
         Map<String, Integer> res = new HashMap<>();
         for (int x = 0; x < wireList.size(); x++) {
@@ -165,30 +198,4 @@ public class WireEditorDialog extends DialogFragment {
 
         return res;
     }
-
-    /*//Pass in the name of the wire to have selected
-    public WireEditorDialog setSpinnerPos(String name) {
-        if (name == null) {
-            Log.v(LOG_TAG, "null stirng");
-            return this;
-        }
-        if (mWireMap.containsKey(name)) {
-            mSpinner.setSelection(mWireMap.get(name));
-        }
-
-        //Log.v(LOG_TAG, name);
-
-        return this;
-    }
-
-    //Set the number for the picker
-    public WireEditorDialog setPicker(int amount) {
-        //if (amount >= mPicker.getMinValue() && amount <= mPicker.getMaxValue()) {
-        mPicker.setValue(amount);
-        //}
-
-        //Log.v(LOG_TAG, amount + "");
-
-        return this;
-    }*/
 }

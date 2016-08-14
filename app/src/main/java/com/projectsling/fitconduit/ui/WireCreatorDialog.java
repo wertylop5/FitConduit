@@ -73,13 +73,6 @@ public class WireCreatorDialog extends DialogFragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 1.0f
         ));
-        //Potentially unneeded
-        /*mPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                Log.v(LOG_TAG, newVal + "");
-            }
-        });*/
 
         mSpinner = (Spinner) view.findViewById(R.id.dialogSpinner);
         /*mSpinner.setAdapter(ArrayAdapter.createFromResource(
@@ -97,16 +90,6 @@ public class WireCreatorDialog extends DialogFragment {
                 1.0f
         ));
         mSpinner.setPadding(dpToPixel(5), 0, dpToPixel(2), 0);
-        /*mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mSelectedItem = ((TextView)view).getText().toString();
-                Log.v(LOG_TAG, "In spinner: " + mSelectedItem);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });*/
 
         return view;
     }
@@ -125,6 +108,7 @@ public class WireCreatorDialog extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Bundle bundle = getArguments();
         if (bundle.containsKey("wireNames")) {
             mWireNames = bundle.getCharSequenceArrayList("wireNames");
@@ -164,6 +148,8 @@ public class WireCreatorDialog extends DialogFragment {
     }
 
     private Map<String, Integer> makeWireMap(List<CharSequence> wireList) {
+        if (wireList == null) return null;
+
         Map<String, Integer> res = new HashMap<>();
         for (int x = 0; x < wireList.size(); x++) {
             res.put(wireList.get(x).toString(), x);
@@ -171,30 +157,4 @@ public class WireCreatorDialog extends DialogFragment {
 
         return res;
     }
-
-    /*//Pass in the name of the wire to have selected
-    public WireCreatorDialog setSpinnerPos(String name) {
-        if (name == null) {
-            Log.v(LOG_TAG, "null stirng");
-            return this;
-        }
-        if (mWireMap.containsKey(name)) {
-            mSpinner.setSelection(mWireMap.get(name));
-        }
-
-        //Log.v(LOG_TAG, name);
-
-        return this;
-    }
-
-    //Set the number for the picker
-    public WireCreatorDialog setPicker(int amount) {
-        //if (amount >= mPicker.getMinValue() && amount <= mPicker.getMaxValue()) {
-            mPicker.setValue(amount);
-        //}
-
-        //Log.v(LOG_TAG, amount + "");
-
-        return this;
-    }*/
 }
