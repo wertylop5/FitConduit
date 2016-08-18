@@ -1,5 +1,6 @@
 package com.projectsling.fitconduit.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -11,20 +12,38 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
 import com.projectsling.fitconduit.R;
+import com.projectsling.fitconduit.model.InitWireData;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements WireCreatorDialog.OnWireCreateListener, WireEditorDialog.OnWireEditListener,
 WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String WIRE_DATA_FILE_NAME = "wireData.json";
+    private static final String CONDUIT_DATA_FILE_NAME = "conduitData.json";
+
+    //For use with initDataFile
+    private static final int WIRE_FILE_SWITCH = 0;
+    private static final int CONDUIT_FILE_SWITCH = 1;
+
     FragmentManager mFragmentManager;
     RelativeLayout mRelativeLayout;
     private String mWireChoiceFragmentTag = "WireChoiceTag";
     private String mResultsFragmentTag = "ResultsTag";
+    private List<JSONObject> mWireList;
+    private List<JSONObject> mConduitList;
 
     //WireCreatorDialog calls this
     @Override
@@ -75,24 +94,33 @@ WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener {
         if(savedInstanceState == null) {
             //Log.v(LOG_TAG, "null");
 
-            //Holds the json for each wire
-            //Should be in form of
-            /*
+            if (fileExists(WIRE_DATA_FILE_NAME)) {
+                deleteFile(WIRE_DATA_FILE_NAME);
+            }
+
+            if (!fileExists(WIRE_DATA_FILE_NAME)) {
+                initDataFile(WIRE_DATA_FILE_NAME, WIRE_FILE_SWITCH);
+            }
+            if (!fileExists(CONDUIT_DATA_FILE_NAME)) {
+                initDataFile(CONDUIT_DATA_FILE_NAME, CONDUIT_FILE_SWITCH);
+            }
+
+
+            /*Holds the json for each wire
+            * Should be in form of
             * {
             *   "name":<string>,
             *   "od":<double>
             * }
             * */
-            ArrayList<JSONObject> list = new ArrayList<>();
-            try {
-                list.add(new JSONObject("{\"name\":\"uno\", \"od\":1.0}"));
-                list.add(new JSONObject("{\"name\":\"dos\", \"od\":2.0}"));
-                list.add(new JSONObject("{\"name\":\"tres\", \"od\":3.0}"));
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "JSON exception", e);
-            }
+            mWireList = new ArrayList<>();
+            getJsonFromFile(mWireList, WIRE_DATA_FILE_NAME);
 
-            WireChoiceFragment frag = WireChoiceFragment.newInstance(list);
+            mConduitList = new ArrayList<>();
+            getJsonFromFile(mConduitList, CONDUIT_DATA_FILE_NAME);
+
+            WireChoiceFragment frag = WireChoiceFragment.newInstance(
+                    (ArrayList<JSONObject>) mWireList, (ArrayList<JSONObject>) mConduitList);
             //Add the wire choice fragment
             mFragmentManager.beginTransaction()
                     .add(R.id.mainActivityContainer, frag, mWireChoiceFragmentTag)
@@ -134,5 +162,71 @@ WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener {
     public void openAbout() {
         Intent intent = new Intent(this, AboutActivity.class);
         startActivity(intent);
+    }
+
+    private void getJsonFromFile(List<JSONObject> wireList, String fileName) {
+        BufferedReader input = null;
+        try {
+            input = new BufferedReader(
+                    new InputStreamReader(openFileInput(fileName)));
+            String line;
+            while ((line = input.readLine()) != null) {
+                Log.v(LOG_TAG, line);
+                wireList.add(new JSONObject(line));
+            }
+
+        } catch (FileNotFoundException e) {
+            Log.e(LOG_TAG, "File not found", e);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "IOException", e);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "JsonException", e);
+        }
+        finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "IOException", e);
+                }
+            }
+        }
+    }
+
+    private void initDataFile(String fileName, int type) {
+        InitWireData init = new InitWireData();
+        PrintWriter output = null;
+
+        try {
+            output = new PrintWriter(
+                    new OutputStreamWriter(
+                            openFileOutput(fileName, Context.MODE_PRIVATE)));
+
+            switch (type) {
+                case WIRE_FILE_SWITCH:
+                    for (int x = 0; x < init.getWireListAmount(); x++) {
+                        output.println(init.getWireDataPairString(x));
+                    }
+                    break;
+                case CONDUIT_FILE_SWITCH:
+                    for (int x = 0; x < init.getConduitListAmount(); x++) {
+                        output.println(init.getConduitDataPairString(x));
+                    }
+                    break;
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (output != null) {
+                output.close();
+            }
+        }
+    }
+
+    private boolean fileExists(String fileName) {
+        File file = getFileStreamPath(fileName);
+        return file.exists();
     }
 }

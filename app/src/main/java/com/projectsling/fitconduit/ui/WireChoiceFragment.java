@@ -9,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 
 import com.projectsling.fitconduit.R;
 import com.projectsling.fitconduit.model.WireAdapter;
@@ -19,7 +21,9 @@ import com.projectsling.fitconduit.model.WireAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -32,19 +36,25 @@ public class WireChoiceFragment extends Fragment {
     private static final String LOG_TAG = WireChoiceFragment.class.getSimpleName();
 
     private List<JSONObject> mWireList;
+    private List<JSONObject> mConduitList;
+
+    //For the listview
     private WireAdapter mWireAdapter;
 
     private ListView mListView;
     private Button mButton;
+    private Spinner mSpinner;
     private WireCreatorDialog mWireCreatorDialog;
 
     public WireChoiceFragment() {}
 
-    public static WireChoiceFragment newInstance(ArrayList<JSONObject> wireList) {
+    public static WireChoiceFragment newInstance(ArrayList<JSONObject> wireList,
+                                                 ArrayList<JSONObject> conduitList) {
         WireChoiceFragment frag = new WireChoiceFragment();
         Bundle bundle = new Bundle();
 
         bundle.putSerializable("wireList", wireList);
+        bundle.putSerializable("conduitList", conduitList);
         frag.setArguments(bundle);
 
         return frag;
@@ -63,6 +73,14 @@ public class WireChoiceFragment extends Fragment {
         }
         else {
             Log.e(LOG_TAG, "No wire list found");
+        }
+
+        if (bundle.containsKey("conduitList")) {
+            mConduitList = (List<JSONObject>) bundle.getSerializable("conduitList");
+            getArguments().remove("conduitList");
+        }
+        else {
+            Log.e(LOG_TAG, "No conduit list found");
         }
     }
 
@@ -115,6 +133,12 @@ public class WireChoiceFragment extends Fragment {
                 mWireCreatorDialog.show(getActivity().getSupportFragmentManager(), "wireCreator");
             }
         });
+
+        mSpinner = (Spinner) root.findViewById(R.id.conduitSpinner);
+        mSpinner.setAdapter(new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item,
+                new ArrayList<String>(new LinkedHashSet<String>(
+                        getStringKeyfromJsonList(mConduitList, "type")))));
 
         //An object used to apply attributes to views dynamically
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -193,5 +217,35 @@ public class WireChoiceFragment extends Fragment {
         } catch (JSONException e) {
             Log.e(LOG_TAG, "JSONException", e);
         }
+    }
+
+    //probs badly made
+    @SuppressWarnings("unchecked")
+    private <T> ArrayList<T> getKeyfromJsonList(List<JSONObject> itemList, String key) {
+        ArrayList<T> res = new ArrayList<>();
+
+        for (JSONObject json : itemList) {
+            try {
+                res.add((T) json.get(key));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return res;
+    }
+
+    private ArrayList<String> getStringKeyfromJsonList(List<JSONObject> itemList, String key) {
+        ArrayList<String> res = new ArrayList<>();
+
+        for (JSONObject json : itemList) {
+            try {
+                res.add(json.getString(key));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return res;
     }
 }

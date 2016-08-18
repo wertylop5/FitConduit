@@ -15,6 +15,7 @@ For power conductors, make sure appropriate conductor gauge is specified for the
     <string name="wires">Wires</string>
     <string name="rowWireName">Name: %1$s</string>
     <string name="rowWireAmount">Amount: %1$d</string>
+    <string name="selectConduit">Select conduit type</string>
 
     <string-array
         name="wireNames">
