@@ -26,10 +26,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
         implements WireCreatorDialog.OnWireCreateListener, WireEditorDialog.OnWireEditListener,
-WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener {
+        WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener,
+        WireChoiceFragment.OnCalculateListener {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String WIRE_DATA_FILE_NAME = "wireData.json";
     private static final String CONDUIT_DATA_FILE_NAME = "conduitData.json";
@@ -81,6 +83,13 @@ WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener {
     }
 
     @Override
+    public void onCalculate(List<JSONObject> selectedWires, List<Integer> selectedWireAmounts,
+                            String selectedConduit, List<JSONObject> conduitList) {
+        ((ResultsFragment) mFragmentManager.findFragmentByTag(mResultsFragmentTag))
+                .calculate(selectedWires, selectedWireAmounts, selectedConduit, conduitList);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -116,6 +125,16 @@ WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener {
             mWireList = new ArrayList<>();
             getJsonFromFile(mWireList, WIRE_DATA_FILE_NAME);
 
+            /*
+            * Holds the json for each conduit
+            *
+            * {
+            *   "type":<string>,
+            *   "diameter":<double>,
+            *   "area":<double>
+            * }
+            *
+            * */
             mConduitList = new ArrayList<>();
             getJsonFromFile(mConduitList, CONDUIT_DATA_FILE_NAME);
 

@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.projectsling.fitconduit.R;
 import com.projectsling.fitconduit.model.WireAdapter;
@@ -21,16 +22,17 @@ import com.projectsling.fitconduit.model.WireAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO
  * Create a map from list of jsonobjects
- * create a model to store the name and amount of an entry to pass to adapter
- * Too many wires cause create wire button to slide off
+ * make a landscape layout
+ * Continue on the calculation
  * */
 public class WireChoiceFragment extends Fragment {
     private static final String LOG_TAG = WireChoiceFragment.class.getSimpleName();
@@ -38,15 +40,24 @@ public class WireChoiceFragment extends Fragment {
     private List<JSONObject> mWireList;
     private List<JSONObject> mConduitList;
 
+    private Map<String, JSONObject> mWireNameMap;       //Key is wire name, value is the JSONObject
+
     //For the listview
     private WireAdapter mWireAdapter;
-
     private ListView mListView;
     private Button mButton;
+    private Button mCalcButton;
     private Spinner mSpinner;
     private WireCreatorDialog mWireCreatorDialog;
 
+    private OnCalculateListener mCallBack;
+
     public WireChoiceFragment() {}
+
+    public interface OnCalculateListener {
+        void onCalculate(List<JSONObject> selectedWires, List<Integer> selectedWireAmounts,
+                         String selectedConduit, List<JSONObject> conduitList);
+    }
 
     public static WireChoiceFragment newInstance(ArrayList<JSONObject> wireList,
                                                  ArrayList<JSONObject> conduitList) {
@@ -61,6 +72,18 @@ public class WireChoiceFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mCallBack = (OnCalculateListener) context;
+        }
+        catch (ClassCastException e) {
+            Log.e(LOG_TAG, "Class cast", e);
+        }
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +91,7 @@ public class WireChoiceFragment extends Fragment {
 
         if (bundle.containsKey("wireList")) {
             mWireList = (ArrayList<JSONObject>) bundle.getSerializable("wireList");
+            mWireNameMap = makeWireMap(mWireList);
             getArguments().remove("wireList");
             mWireCreatorDialog = WireCreatorDialog.newInstance(makeWireNameList());
         }
@@ -138,7 +162,52 @@ public class WireChoiceFragment extends Fragment {
         mSpinner.setAdapter(new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 new ArrayList<String>(new LinkedHashSet<String>(
-                        getStringKeyfromJsonList(mConduitList, "type")))));
+                        getStringKeyFromJsonList(mConduitList, "type")))));
+
+        mCalcButton = (Button) root.findViewById(R.id.wireCalcButton);
+        mCalcButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                * Things that need to go to results frag
+                * Selected conduit type
+                * Total cable quantity
+                * Total cable area
+                * Conduit list
+                * */
+
+                //Map<JSONObject, Integer> selectedWires = new HashMap<JSONObject, Integer>();
+                List<JSONObject> selectedWires = new ArrayList<>();
+                List<Integer> selectedWireAmounts = new ArrayList<>();
+                for (int x = 0; x < mWireAdapter.getCount(); x++) {
+                    try {
+                        /*selectedWires.put(
+                                mWireNameMap.get(
+                                        ((JSONObject) mWireAdapter.getItem(x))
+                                                .getString("name")),
+                                ((JSONObject) mWireAdapter.getItem(x))
+                                        .getInt("amount")
+                        );*/
+
+                        selectedWires.add(
+                                mWireNameMap.get(
+                                        ((JSONObject) mWireAdapter.getItem(x))
+                                                .getString("name"))
+                        );
+                        selectedWireAmounts.add(
+                                ((JSONObject) mWireAdapter.getItem(x))
+                                        .getInt("amount")
+                        );
+                    } catch (JSONException e) {
+                        Log.e(LOG_TAG, "JsonException", e);
+                    }
+                }
+
+                mCallBack.onCalculate(selectedWires, selectedWireAmounts,
+                        ((TextView) mSpinner.getSelectedView()).getText().toString(),
+                        mConduitList);
+            }
+        });
 
         //An object used to apply attributes to views dynamically
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -170,7 +239,8 @@ public class WireChoiceFragment extends Fragment {
 
     //MainActivity calls this
     public void editWire(String newWire, int amount, int wireListPosition) {
-        Log.v(LOG_TAG, "New name " + newWire + " new amount " + amount + " pos " + wireListPosition);
+        Log.v(LOG_TAG, "New name " + newWire + " new amount "
+                + amount + " pos " + wireListPosition);
         JSONObject json = new JSONObject();
         try {
             json.put("name", newWire)
@@ -235,14 +305,27 @@ public class WireChoiceFragment extends Fragment {
         return res;
     }
 
-    private ArrayList<String> getStringKeyfromJsonList(List<JSONObject> itemList, String key) {
+    private ArrayList<String> getStringKeyFromJsonList(List<JSONObject> itemList, String key) {
         ArrayList<String> res = new ArrayList<>();
 
         for (JSONObject json : itemList) {
             try {
                 res.add(json.getString(key));
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, "Json", e);
+            }
+        }
+
+        return res;
+    }
+
+    private HashMap<String, JSONObject> makeWireMap(List<JSONObject> wireList) {
+        HashMap<String, JSONObject> res = new HashMap<>();
+        for (JSONObject json : wireList) {
+            try {
+                res.put(json.getString("name"), json);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, "JsonException", e);
             }
         }
 

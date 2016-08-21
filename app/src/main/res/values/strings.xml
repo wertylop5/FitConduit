@@ -10,23 +10,14 @@
     <string name="aboutHunkOfText">NOTE: actual conduit size to be used on project should be based on project specific requirements and location of conduit run (e.g., if conduit is to be installed across platform ceiling, then a 4" conduit cannot be used due to Program Coordination restrictions). Calculation below provides the smallest conduit that fits the stated cables. To reduce conduit size, you may need to decrease the number of cables to be run in the conduit and possibly install multiple conduits. You may also need to increase the conduit size to meet project-specific constraints.
 
 For power conductors, make sure appropriate conductor gauge is specified for the rated current. The maximum ampacity of conductor can be found in NEC Annex B, Table B.310. From the table, choose the correct AWG and the insulation used for conductor (Article 310, table 310.13 for insulation details). DON'T forget to multiply by correction factor for ambient temperature!</string>
+
     <!--Used in WireChoiceFragment-->
     <string name="rowWireNumber">Wire %1$d</string>
     <string name="wires">Wires</string>
     <string name="rowWireName">Name: %1$s</string>
     <string name="rowWireAmount">Amount: %1$d</string>
     <string name="selectConduit">Select conduit type</string>
-
-    <string-array
-        name="wireNames">
-        <item>Hery</item>
-        <item>Boby</item>
-    </string-array>
-
-    <string-array
-        name="conduitNames">
-
-    </string-array>
+    <string name="calculate">Calculate</string>
 
     <!--Used in WireCreatorDialog-->
     <string name="create">Create</string>
@@ -40,5 +31,17 @@ For power conductors, make sure appropriate conductor gauge is specified for the
     <!--Used in WireDeleteDialog-->
     <string name="delete">Delete</string>
     <string name="deletePrompt">Delete wire %1$d?</string>
+
+    <!--Used in ResultsFragment-->
+    <string name="results">Results</string>
+    <string name="totalWires">Total amount of wires: %1$d</string>
+    <string name="totalWireArea">Total area of wires: %1$f</string>
+    <string name="selectedConduit">Conduit type chosen: %1$s</string>
+    <string name="minConduitSize">Minimum conduit size: %1$s</string>
+    <string name="conduitFillPercent">Conduit fill percent: %1$s%%</string>
+
+    <string name="noWires">No wires inputted</string>
+    <string name="tooManyWires">Total wire area exceeded largest available conduit. Try reducing the amount.</string>
+    <string name="error">Error</string>
 
 </resources>
