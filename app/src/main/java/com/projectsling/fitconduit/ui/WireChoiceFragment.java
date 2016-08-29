@@ -28,14 +28,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-/**
- * TODO
- * Create a map from list of jsonobjects
- * make a landscape layout
- * Continue on the calculation
- * */
 public class WireChoiceFragment extends Fragment {
     private static final String LOG_TAG = WireChoiceFragment.class.getSimpleName();
+    private static final String UNKNOWN_WIRE_DIALOG_TAG = "unknownWireDialog";
+    private static final String WIRE_MENU_DIALOG = "wireMenu";
+    private static final String WIRE_CREATOR_DIALOG = "wireCreator";
+    private static final String WIRE_EDITOR_DIALOG = "wireEditor";
 
     private List<JSONObject> mWireList;
     private List<JSONObject> mConduitList;
@@ -47,6 +45,7 @@ public class WireChoiceFragment extends Fragment {
     private ListView mListView;
     private Button mButton;
     private Button mCalcButton;
+    private Button mUnknownWireButton;
     private Spinner mSpinner;
     private WireCreatorDialog mWireCreatorDialog;
 
@@ -128,7 +127,7 @@ public class WireChoiceFragment extends Fragment {
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.v(LOG_TAG, position + "");
+                //Log.v(LOG_TAG, position + "");
 
                 /*try {
                     WireEditorDialog.newInstance(
@@ -141,8 +140,14 @@ public class WireChoiceFragment extends Fragment {
                     Log.e(LOG_TAG, "JSONException", e);
                 }*/
 
-                WireMenuDialog.newInstance(position)
-                        .show(getActivity().getSupportFragmentManager(), "wireMenu");
+                if (((JSONObject) mWireAdapter.getItem(position)).has("name")) {
+                    WireMenuDialog.newInstance(position)
+                            .show(getActivity().getSupportFragmentManager(), WIRE_MENU_DIALOG);
+                }
+                else if (((JSONObject) mWireAdapter.getItem(position)).has("od")) {
+                    WireMenuDialog.newInstance(position, true)
+                            .show(getActivity().getSupportFragmentManager(), WIRE_MENU_DIALOG);
+                }
 
                 return true;
             }
@@ -154,7 +159,16 @@ public class WireChoiceFragment extends Fragment {
             public void onClick(View v) {
                 /*WireCreatorDialog.newInstance(makeWireNameList())
                         .show(getActivity().getSupportFragmentManager(), "wireCreator");*/
-                mWireCreatorDialog.show(getActivity().getSupportFragmentManager(), "wireCreator");
+                mWireCreatorDialog.show(getActivity().getSupportFragmentManager(), WIRE_CREATOR_DIALOG);
+            }
+        });
+
+        mUnknownWireButton = (Button) root.findViewById(R.id.addUnknownWireButton);
+        mUnknownWireButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UnknownWireDialog.newInstance()
+                        .show(getActivity().getSupportFragmentManager(), UNKNOWN_WIRE_DIALOG_TAG);
             }
         });
 
@@ -179,6 +193,7 @@ public class WireChoiceFragment extends Fragment {
                 //Map<JSONObject, Integer> selectedWires = new HashMap<JSONObject, Integer>();
                 List<JSONObject> selectedWires = new ArrayList<>();
                 List<Integer> selectedWireAmounts = new ArrayList<>();
+                String temp;
                 for (int x = 0; x < mWireAdapter.getCount(); x++) {
                     try {
                         /*selectedWires.put(
@@ -189,11 +204,21 @@ public class WireChoiceFragment extends Fragment {
                                         .getInt("amount")
                         );*/
 
-                        selectedWires.add(
-                                mWireNameMap.get(
-                                        ((JSONObject) mWireAdapter.getItem(x))
-                                                .getString("name"))
-                        );
+                        /**Change this to check if null. if so, unnamed wire, take the od instead*/
+
+                        if (((JSONObject) mWireAdapter.getItem(x)).has("name")) {
+                            selectedWires.add(
+                                    mWireNameMap.get(
+                                            ((JSONObject) mWireAdapter.getItem(x))
+                                                    .getString("name"))
+                            );
+                        }
+                        else {
+                            selectedWires.add(
+                                    ((JSONObject) mWireAdapter.getItem(x))
+                            );
+                        }
+
                         selectedWireAmounts.add(
                                 ((JSONObject) mWireAdapter.getItem(x))
                                         .getInt("amount")
@@ -225,7 +250,7 @@ public class WireChoiceFragment extends Fragment {
 
     //MainActivity calls this
     public void createWire(String name, int amount) {
-        Log.v(LOG_TAG, "Got " + name + " with " + amount);
+        //Log.v(LOG_TAG, "Got " + name + " with " + amount);
         JSONObject json = new JSONObject();
         try {
             json.put("name", name)
@@ -238,12 +263,41 @@ public class WireChoiceFragment extends Fragment {
     }
 
     //MainActivity calls this
+    public void createWire(double od, int amount) {
+        //Log.v(LOG_TAG, "Got " + od + " with " + amount);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("od", od)
+                    .put("amount", amount);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "JSONException", e);
+        }
+
+        mWireAdapter.addEntry(json);
+    }
+
+    //MainActivity calls this
     public void editWire(String newWire, int amount, int wireListPosition) {
-        Log.v(LOG_TAG, "New name " + newWire + " new amount "
-                + amount + " pos " + wireListPosition);
+        /*Log.v(LOG_TAG, "New name " + newWire + " new amount "
+                + amount + " pos " + wireListPosition);*/
         JSONObject json = new JSONObject();
         try {
             json.put("name", newWire)
+                    .put("amount", amount);
+            mWireAdapter.editEntry(json, wireListPosition);
+        }
+        catch (JSONException e) {
+            Log.e(LOG_TAG, "JSONException", e);
+        }
+    }
+
+    //MainActivity calls this
+    public void editWire(double od, int amount, int wireListPosition) {
+        /*Log.v(LOG_TAG, "New name " + newWire + " new amount "
+                + amount + " pos " + wireListPosition);*/
+        JSONObject json = new JSONObject();
+        try {
+            json.put("od", od)
                     .put("amount", amount);
             mWireAdapter.editEntry(json, wireListPosition);
         }
@@ -283,26 +337,26 @@ public class WireChoiceFragment extends Fragment {
                         ((JSONObject) mWireAdapter.getItem(wireListPosition)).getString("name"),
                         ((JSONObject) mWireAdapter.getItem(wireListPosition)).getInt("amount"),
                         wireListPosition)
-                    .show(getActivity().getSupportFragmentManager(), "wireEditor");
+                    .show(getActivity().getSupportFragmentManager(), WIRE_EDITOR_DIALOG);
         } catch (JSONException e) {
             Log.e(LOG_TAG, "JSONException", e);
         }
     }
 
-    //probs badly made
-    @SuppressWarnings("unchecked")
-    private <T> ArrayList<T> getKeyfromJsonList(List<JSONObject> itemList, String key) {
-        ArrayList<T> res = new ArrayList<>();
-
-        for (JSONObject json : itemList) {
+    //Position is the wire position in the list
+    public void startEditDialog(int wireListPosition, boolean isUnknown) {
+        Log.v(LOG_TAG, "starting unknown");
+        if (isUnknown) {
             try {
-                res.add((T) json.get(key));
+                UnknownWireDialog.newInstance(
+                        ((JSONObject) mWireAdapter.getItem(wireListPosition)).getDouble("od"),
+                        ((JSONObject) mWireAdapter.getItem(wireListPosition)).getInt("amount"),
+                        wireListPosition
+                ).show(getActivity().getSupportFragmentManager(), UNKNOWN_WIRE_DIALOG_TAG);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, "JSONException", e);
             }
         }
-
-        return res;
     }
 
     private ArrayList<String> getStringKeyFromJsonList(List<JSONObject> itemList, String key) {

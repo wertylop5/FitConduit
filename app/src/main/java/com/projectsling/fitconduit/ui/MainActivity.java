@@ -31,7 +31,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity
         implements WireCreatorDialog.OnWireCreateListener, WireEditorDialog.OnWireEditListener,
         WireMenuDialog.StartEditListener, WireDeleteDialog.OnWireDeleteListener,
-        WireChoiceFragment.OnCalculateListener {
+        WireChoiceFragment.OnCalculateListener, UnknownWireDialog.OnWireCreateListener,
+        UnknownWireDialog.OnWireEditListener {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String WIRE_DATA_FILE_NAME = "wireData.json";
     private static final String CONDUIT_DATA_FILE_NAME = "conduitData.json";
@@ -56,6 +57,15 @@ public class MainActivity extends AppCompatActivity
         frag.createWire(name, amount);
     }
 
+    //UnknownWireDialog calls this
+    @Override
+    public void onWireCreate(double od, int amount) {
+        WireChoiceFragment frag =
+                (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
+        frag.createWire(od, amount);
+    }
+
+    //WireEditorDialog calls this
     @Override
     public void onWireEdit(String newWire, int amount, int position) {
         Log.v(LOG_TAG, "Got edit wire name " + newWire +
@@ -63,6 +73,14 @@ public class MainActivity extends AppCompatActivity
         WireChoiceFragment frag =
                 (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
         frag.editWire(newWire, amount, position);
+    }
+
+    //UnknownWireDialog calls this
+    @Override
+    public void onWireEdit(double od, int amount, int position) {
+        WireChoiceFragment frag =
+                (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
+        frag.editWire(od, amount, position);
     }
 
     @Override
@@ -80,6 +98,16 @@ public class MainActivity extends AppCompatActivity
         WireChoiceFragment frag =
                 (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
         frag.startEditDialog(wireListPosition);
+    }
+
+    //Shows the wire edit dialog (unknown version)
+    @Override
+    public void startEdit(int wireListPosition, boolean isUnknown) {
+        Log.v(LOG_TAG, "Starting unknown");
+
+        WireChoiceFragment frag =
+                (WireChoiceFragment) mFragmentManager.findFragmentByTag(mWireChoiceFragmentTag);
+        frag.startEditDialog(wireListPosition, isUnknown);
     }
 
     @Override

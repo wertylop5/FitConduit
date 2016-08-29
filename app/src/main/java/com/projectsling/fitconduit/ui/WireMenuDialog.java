@@ -20,16 +20,28 @@ public class WireMenuDialog extends DialogFragment {
     public WireMenuDialog() {}
     private static final String LOG_TAG = WireMenuDialog.class.getSimpleName();
     private int mPosition;
+    private boolean mIsUnknown;
     private StartEditListener mCallback;
 
     public interface StartEditListener {
         void startEdit(int wireListPosition);
+        void startEdit(int wireListPosition, boolean isUnknown);
     }
 
     public static WireMenuDialog newInstance(int position) {
         WireMenuDialog dialog = new WireMenuDialog();
         Bundle bundle = new Bundle();
         bundle.putInt("position", position);
+
+        dialog.setArguments(bundle);
+        return dialog;
+    }
+
+    public static WireMenuDialog newInstance(int position, boolean isUnknown) {
+        WireMenuDialog dialog = new WireMenuDialog();
+        Bundle bundle = new Bundle();
+        bundle.putInt("position", position);
+        bundle.putBoolean("isUnknown", isUnknown);
 
         dialog.setArguments(bundle);
         return dialog;
@@ -50,8 +62,15 @@ public class WireMenuDialog extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
 
-        mPosition = getArguments().getInt("position");
+        mPosition = bundle.getInt("position");
+        if (bundle.containsKey("isUnknown")) {
+            mIsUnknown = bundle.getBoolean("isUnknown");
+        }
+        else {
+            mIsUnknown = false;
+        }
     }
 
     @NonNull
@@ -70,7 +89,14 @@ public class WireMenuDialog extends DialogFragment {
                         * Better to call a different function to get the data rather than
                         * Passing to this dialog
                         * */
-                        mCallback.startEdit(mPosition);
+                        if (!mIsUnknown) {
+                            mCallback.startEdit(mPosition);
+                        }
+                        else {
+                            Log.v(LOG_TAG, "unknown");
+                            mCallback.startEdit(mPosition, mIsUnknown);
+                        }
+
                     }
                 })
                 .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {

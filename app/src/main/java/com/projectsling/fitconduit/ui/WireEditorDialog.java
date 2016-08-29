@@ -84,11 +84,6 @@ public class WireEditorDialog extends DialogFragment {
         mPicker.setMaxValue(99);
         mPicker.setGravity(Gravity.CENTER_VERTICAL);
         mPicker.setPadding(dpToPixel(2), 0, dpToPixel(20), 0);
-        mPicker.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                1.0f
-        ));
         mPicker.setValue(mAmount);
 
         mSpinner = (Spinner) view.findViewById(R.id.dialogSpinner);

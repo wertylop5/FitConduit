@@ -12,36 +12,44 @@
 For power conductors, make sure appropriate conductor gauge is specified for the rated current. The maximum ampacity of conductor can be found in NEC Annex B, Table B.310. From the table, choose the correct AWG and the insulation used for conductor (Article 310, table 310.13 for insulation details). DON'T forget to multiply by correction factor for ambient temperature!</string>
 
     <!--Used in WireChoiceFragment-->
-    <string name="rowWireNumber">Wire %1$d</string>
-    <string name="wires">Wires</string>
-    <string name="rowWireName">Name: %1$s</string>
-    <string name="rowWireAmount">Amount: %1$d</string>
+    <string name="rowWireNumber">Cable %1$d</string>
+    <string name="wires">Cables</string>
     <string name="selectConduit">Select conduit type</string>
     <string name="calculate">Calculate</string>
+
+    <!--Used in WireAdapter-->
+    <string name="rowWireName">Name: %1$s</string>
+    <string name="rowWireAmount">Amount: %1$d</string>
+    <string name="od">Od: %1$f</string>
 
     <!--Used in WireCreatorDialog-->
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
-    <string name="wireAdd">Add a new wire</string>
+    <string name="wireAdd">Add a new cable</string>
+    <string name="unknownWireAdd">Add a new unnamed cable</string>
 
     <!--Used in WireEditorDialog-->
     <string name="edit">Edit</string>
-    <string name="wireEdit">Edit wire %1$d</string>
+    <string name="wireEdit">Edit cable %1$d</string>
 
     <!--Used in WireDeleteDialog-->
     <string name="delete">Delete</string>
-    <string name="deletePrompt">Delete wire %1$d?</string>
+    <string name="deletePrompt">Delete cable %1$d?</string>
 
     <!--Used in ResultsFragment-->
     <string name="results">Results</string>
-    <string name="totalWires">Total amount of wires: %1$d</string>
-    <string name="totalWireArea">Total area of wires: %1$f</string>
+    <string name="totalWires">Total amount of cable: %1$d</string>
+    <string name="totalWireArea">Total area of cables: %1$f</string>
     <string name="selectedConduit">Conduit type chosen: %1$s</string>
     <string name="minConduitSize">Minimum conduit size: %1$s</string>
     <string name="conduitFillPercent">Conduit fill percent: %1$s%%</string>
 
-    <string name="noWires">No wires inputted</string>
-    <string name="tooManyWires">Total wire area exceeded largest available conduit. Try reducing the amount.</string>
+    <string name="noWires">No cables inputted</string>
+    <string name="tooManyWires">Total cable area exceeded largest available conduit. Try reducing the amount.</string>
     <string name="error">Error</string>
+
+    <!--Used in ???-->
+    <string name="hintEnterOd">Enter cable od</string>
+
 
 </resources>

@@ -24,11 +24,27 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"/>
 
-    <Button
-        android:id="@+id/addWireButton"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/wireAdd"/>
+        android:orientation="horizontal"
+        style="?android:attr/buttonBarStyle">
+
+        <Button
+            android:id="@+id/addWireButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wireAdd"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+        <Button
+            android:id="@+id/addUnknownWireButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unknownWireAdd"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"

@@ -99,7 +99,7 @@ public class ResultsFragment extends Fragment {
 
         //Want to cut the function off early
         if (totalWireAmount == 0) {
-            Toast.makeText(getActivity(), R.string.noWires, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.noWires, Toast.LENGTH_SHORT).show();
             return;
         }
 

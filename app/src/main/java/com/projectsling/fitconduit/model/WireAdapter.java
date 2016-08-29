@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * Created by Stanley on 8/4/2016.
  */
+
 public class WireAdapter extends BaseAdapter{
     private static final String LOG_TAG = WireAdapter.class.getSimpleName();
     private Context mContext;
@@ -81,18 +82,35 @@ public class WireAdapter extends BaseAdapter{
                 R.string.rowWireNumber,
                 position //+ 1
         ));
-        try {
-            holder.mWireName.setText(mContext.getResources().getString(
-                    R.string.rowWireName,
-                    ((JSONObject) getItem(position)).getString("name")
-            ));
-            holder.mWireAmount.setText(mContext.getResources().getString(
-                    R.string.rowWireAmount,
-                    ((JSONObject) getItem(position)).getInt("amount")
-            ));
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, "JSONException", e);
+        if (((JSONObject) getItem(position)).has("name")) {
+            try {
+                holder.mWireName.setText(mContext.getResources().getString(
+                        R.string.rowWireName,
+                        ((JSONObject) getItem(position)).getString("name")
+                ));
+                holder.mWireAmount.setText(mContext.getResources().getString(
+                        R.string.rowWireAmount,
+                        ((JSONObject) getItem(position)).getInt("amount")
+                ));
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, "JSONException", e);
+            }
         }
+        else {
+            try {
+                holder.mWireName.setText(mContext.getResources().getString(
+                        R.string.od,
+                        ((JSONObject) getItem(position)).getDouble("od")
+                ));
+                holder.mWireAmount.setText(mContext.getResources().getString(
+                        R.string.rowWireAmount,
+                        ((JSONObject) getItem(position)).getInt("amount")
+                ));
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, "JSONException", e);
+            }
+        }
+
 
         return convertView;
     }
